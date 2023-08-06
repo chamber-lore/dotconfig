@@ -1,0 +1,22 @@
+#!/bin/sh
+
+old_volume=0
+reset_volume() {
+	pactl set-sink-volume @DEFAULT_SINK@ "$old_volume"
+}
+
+i=0
+while [ "$i" -lt "$1" ]; do
+	xte 'key Hyper_L'
+	i=$((i+1))
+	sleep 60
+done
+old_volume="$(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}' | head -n1)"
+pactl set-sink-volume @DEFAULT_SINK@ "$2%"
+if mpv ~/vids/ketchup.mp4; then
+	pactl set-sink-volume @DEFAULT_SINK@ "$old_volume"
+else
+	reset_volume
+fi
+
+trap reset_volume INT

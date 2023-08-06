@@ -1,0 +1,68 @@
+#!/bin/sh
+
+path="/home/proanti/docs/food_log.txt"
+
+add () {	
+	calories=0
+	while : ; do
+		printf 'Enter calorie count (blank or <=0 to abandon): '
+		read -r calories
+		if [ "$calories" -gt 0 ] 2>/dev/null; then
+			printf '%b' "$(date +%F\ %H:%M): $calories\n" >> $path
+		else
+			break
+		fi
+	done
+}
+
+remove () {
+	printf 'Enter search term: '
+	read -r term
+	result="$(grep -n "$term" $path)"
+	printf '%b' "$result\n"
+	if [ -n "$result" ]; then
+		line=0
+		while : ; do
+			printf 'Enter line number to delete (blank or <=0 to abandon): '
+			read -r line
+			if [ -z "$line" ] || [ "$line" -le 0 ]; then
+				break
+			elif ! printf '%s' "$result" | printf '%s:' "$(awk -F':' '{print $1}'):" | grep -q "$line:"; then
+				printf "Please enter a displayed line number.\n"
+			fi
+			[ -n "$line" ] && [ "$line" -gt 0 ] && sed -i "${line}d" $path 
+		done
+	else
+		printf "No results to show.\n"
+	fi
+}
+
+#total () {
+
+#}
+
+#summarize () {
+
+#}
+
+quit () {
+	exit 0
+}
+
+cmd=""
+while : ; do
+	if [ -n "$1" ]; then
+		cmd=$1
+	else
+		printf 'Enter command (add, remove, total, summarize, quit): '
+		read -r cmd
+	fi
+	cmd=$(printf '%s' "$cmd" | awk '{print tolower($0)}')
+	cmdlist="add\nremove\ntotal\nsummarize\nquit\n"
+	if [ "$(printf '%b' "$cmdlist" | grep -c "$cmd")" = '1' ]; then
+		"$(printf '%b' "$cmdlist" | grep "$cmd")"
+	else
+		printf "Please enter a recognized command.\n"
+	fi
+	[ -n "$1" ] && exit 0
+done

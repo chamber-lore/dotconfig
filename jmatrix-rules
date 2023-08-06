@@ -1,0 +1,155 @@
+# WARNING: This file can be overwritten easily with the :jmatrix-write-rules command
+# When data is overwritten, formatting and comments will be lost.
+# Please exercise caution when editing this file directly, and make sure to keep backups.
+
+
+https-strict: behind-the-scene false
+matrix-off: behind-the-scene true
+matrix-off: about-scheme true
+matrix-off: chrome-extension-scheme true
+matrix-off: chrome-scheme true
+matrix-off: moz-extension-scheme true
+matrix-off: opera-scheme true
+matrix-off: vivaldi-scheme true
+matrix-off: wyciwyg-scheme true
+matrix-off: qute-scheme true
+* * * block
+* * css allow
+* * frame block
+* * image allow
+* 1st-party * allow
+* 1st-party frame allow
+amazon.com d1cgrmilfgg1y.cloudfront.net * allow
+amazon.com d1nruqhae353qc.cloudfront.net * allow
+amazon.com d2ef20sk9hi1u3.cloudfront.net * allow
+amazon.com d2h8zr0m6mus4x.cloudfront.net * allow
+amazon.com dr3fr5q4g2ul9.cloudfront.net * allow
+amazon.com media-amazon.com * allow
+amazon.com ssl-images-amazon.com * allow
+capitalone.com d1af033869koo7.cloudfront.net * allow
+discord.com discord.gg * allow
+discord.com discord.media * allow
+discord.com discordapp.com * allow
+discord.com discordapp.net * allow
+discord.com hcaptcha.com * allow
+discord.com storage.googleapis.com * allow
+ebay.com ebaydesc.com * allow
+ebay.com ebaydesc.com frame allow
+ebay.com ebaystatic.com * allow
+fidelity.com 3gl.net * allow
+fidelity.com glancecdn.net * allow
+fidelity.com jquery.com * allow
+goodreads.com amazon.com * allow
+goodreads.com appsync-api.us-east-1.amazonaws.com * allow
+goodreads.com cognito-identity.us-east-1.amazonaws.com * allow
+goodreads.com media-amazon.com * allow
+goodreads.com ssl-images-amazon.com * allow
+google.com gstatic.com * allow
+google.com youtube.com * allow
+google.com youtube.com frame allow
+kayak.com r9cdn.net * allow
+linkedin.com arkoselabs.com * allow
+linkedin.com arkoselabs.com frame allow
+linkedin.com licdn.com * allow
+live.com aspnetcdn.com * allow
+live.com azureedge.net * allow
+live.com gfx.ms * allow
+live.com microsoft.com * allow
+live.com microsoft.com frame allow
+live.com msftauth.net * allow
+live.com msocdn.com * allow
+live.com office.net * allow
+live.com onedrive.com * allow
+live.com sfx.ms * allow
+live.com sfx.ms frame allow
+microsoft.com gfx.ms * allow
+microsoft.com msecnd.net * allow
+microsoftonline.com live.com * allow
+microsoftonline.com live.com frame allow
+microsoftonline.com microsoft.com * allow
+microsoftonline.com msauth.net * allow
+microsoftonline.com msftauth.net * allow
+odysee.com odycdn.com * allow
+odysee.com odysee.live * allow
+odysee.com odysee.tv * allow
+onedrive.com azureedge.net * allow
+onedrive.com msftauth.net * allow
+shellcheck.net ajax.googleapis.com * allow
+thepiratebay.org * * allow
+tlopo.com ajax.googleapis.com * allow
+tlopo.com cloudflare.com * allow
+tlopo.com jquery.com * allow
+wikipedia.org wikimedia.org * allow
+youtube.com googlevideo.com * allow
+github.com github.githubassets.com script allow
+github.com raw.githubusercontent.com xhr allow
+chamber-lore-fantastic-goggles-xq7pgwrvvxphpgp.github.dev api.github.com xhr allow
+chamber-lore-fantastic-goggles-xq7pgwrvvxphpgp.github.dev v--1h9odlmqok937sp8ljecfrvscode-cdn.net * allow
+www.reddit.com www.redditstatic.com script allow
+cs50.harvard.edu ajax.googleapis.com script allow
+cs50.harvard.edu video.cs50.io frame allow
+cs50.harvard.edu video.cs50.io script allow
+cs50.harvard.edu video.cs50.io other allow
+cs50.harvard.edu www.youtube.com frame allow
+cs50.harvard.edu www.youtube.com script allow
+cs50.harvard.edu www.youtube.com xhr allow
+cs50.harvard.edu www.youtube.com other allow
+cs50.harvard.edu cdnjs.cloudflare.com script allow
+cs50.harvard.edu googlevideo.com xhr allow
+cs50.harvard.edu cdn.jsdelivr.net script allow
+submit.cs50.io cdn.jsdelivr.net script allow
+submit.cs50.io cdnjs.cloudflare.com script allow
+submit.cs50.io code.jquery.com script allow
+submit.cs50.io unpkg.com script allow
+cs50.dev g9mp5m2251ps.statuspage.io script allow
+missing.csail.mit.edu www.youtube.com frame allow
+missing.csail.mit.edu www.youtube.com script allow
+missing.csail.mit.edu www.youtube.com xhr allow
+missing.csail.mit.edu googlevideo.com xhr allow
+regexone.com cdnjs.cloudflare.com script allow
+learngitbranching.js.org ssl.google-analytics.com script allow
+www.py4e.com static.tsugi.org script allow
+www.py4e.com www.youtube.com frame allow
+www.py4e.com www.youtube.com script allow
+www.py4e.com www.youtube.com xhr allow
+www.py4e.com googlevideo.com xhr allow
+www.coursera.org d3njjcbhbojbot.cloudfront.net script allow
+www.coursera.org browser.sentry-cdn.com script allow
+www.coursera.org www.recaptcha.net script allow
+www.coursera.org algolianet.com script allow
+www.coursera.org algolia.net xhr allow
+www.pewresearch.org cdn.parsely.com script allow
+www.goacta.org www.surveymonkey.com frame allow
+www.goacta.org prod.smassets.net script allow
+www.goacta.org cdn.signalfx.com script allow
+www.refseek.com cse.google.com script allow
+www.refseek.com www.google.com script allow
+twitter.com abs.twimg.com script allow
+twitter.com abs.twimg.com xhr allow
+twitter.com video.twimg.com xhr allow
+www.winehq.org code.jquery.com script allow
+www.winehq.org maxcdn.bootstrapcdn.com script allow
+signup.leagueoflegends.com lolstatic-a.akamaihd.net other allow
+signup.leagueoflegends.com lolstatic-a.akamaihd.net script allow
+signup.leagueoflegends.com cmp.osano.com script allow
+signup.leagueoflegends.com cmp.osano.com frame allow
+signup.leagueoflegends.com cmp.osano.com xhr allow
+signup.leagueoflegends.com hcaptcha.com script allow
+signup.leagueoflegends.com hcaptcha.com xhr allow
+signup.leagueoflegends.com consent.api.osano.com xhr allow
+signup.leagueoflegends.com newassets.hcaptcha.com frame allow
+signup.leagueoflegends.com api.hcaptcha.com xhr allow
+signup.leagueoflegends.com zn9blfwvwtdifxopg-riotgames.siteintercept.qualtrics.com script allow
+www.pythonanywhere.com www.google.com script allow
+www.pythonanywhere.com www.gstatic.com script allow
+www.pythonanywhere.com pythonanywhere.com xhr allow
+ocw.mit.edu w.appzi.io script block
+ocw.mit.edu api.appzi.io xhr block
+ocw.mit.edu www.youtube.com script allow
+ocw.mit.edu www.youtube.com frame allow
+ocw.mit.edu www.youtube.com xhr allow
+ocw.mit.edu googlevideo.com xhr allow
+www.imdb.com m.media-amazon.com xhr allow
+www.imdb.com m.media-amazon.com script allow
+www.imdb.com images-na.ssl-images-amazon.com script allow
+www.imdb.com cloudfront.net script allow

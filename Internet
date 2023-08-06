@@ -1,0 +1,68 @@
+#!/bin/sh
+
+interface="$(ip link show | grep 'BROADCAST' | head -n1 | awk -F': ' '{print $2}')"
+if [ -n "$1" ]; then
+	ssid="$1"
+else
+	ssid="LockedStocked&Chambered"
+fi
+
+# count number of times through main with a variable, restart after modulo 5?
+count=0
+main () {
+	count=$((count+1))
+	if [ "$((count%5))" -eq 0 ]; then
+		iwd_restart
+	fi
+	istatus="$(iwctl station list | grep "$interface" | awk '{print $3}')"
+	if [ "$istatus" = 'roaming' ]; then
+		printf "%s is roaming. Restarting iwd.service...\n" "$interface"
+		iwd_restart
+		network_connect
+		wait
+	elif [ "$istatus" = 'disconnected' ]; then
+		printf '%b' "$interface is disconnected. Checking if network $ssid is available...\n"
+		network_connect
+		wait
+	elif [ "$istatus" = 'connected' ] && [ "$count" -eq 1 ]; then
+		printf "%s is connected, but the network cache may be inaccurate. Restarting iwd.service...\n" "$interface"
+		iwd_restart
+	else
+		printf '%b' "$interface is $istatus. Checking Internet connection...\n"
+	fi	
+	if ! connectivity_check; then
+		printf "No Internet connection. Waiting ten seconds... (%s)\n" "$count"
+		for i in $(seq 1 10); do
+			printf '%b' "$i\033[0K\r"
+			sleep 1
+		done
+		main
+	else
+		printf "Internet connection found! Enjoy.\n"
+	fi
+}
+
+network_connect() {
+	iwctl station "$interface" scan
+	wait
+	if iwctl station "$interface" get-networks | grep -q "$ssid"; then
+		printf "Network %s is available! Connecting...\n" "$ssid"
+		iwctl station "$interface" connect "$ssid"
+	else
+		printf "Network %s is unavailable (check your router). Restarting iwd.service...\n" "$ssid"
+		iwd_restart
+	fi
+}
+
+iwd_restart() {
+	systemctl restart iwd
+	wait
+	printf "iwd.service restarted.\n"
+}
+
+connectivity_check() {
+	ping -c1 archlinux.org 2>/dev/null 1>&2
+	return $?
+}
+
+main

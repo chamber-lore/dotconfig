@@ -1,0 +1,99 @@
+#!/bin/sh
+
+xclipp="$(command -v xclip)"
+
+x () {
+	if [ -z "$xclipp" ]; then
+		printf "No xclip installation found.\n"
+		exit 0
+	fi
+}
+
+h () {
+	printf "dlxfile [DOWNLOAD {OPTION(S)} LINK]\n\nProvides a command to download an encrypted file in the Profanity XMPP client with xclip. POSIX-compliant!\n\nThis program will search for the download link first in the parameters and second in the clipboard. If the clipboard isn't used (a download link is passed in by parameter and the --without-copying option is set) then xclip is unnecessary.\n\n-d, --directory-default\n               set the download directory to the default, as determined by Profanity (usually \$XDG_HOME)\n-n, --name-default\n               set the filename to the default, as determined by the link provided\n-b, --both-default\n               set both the download directory and filename to their defaults (determined as explained above)\n-p, --print\n               print the generated command on completion\n-w, --without-copying\n               don't copy the generated command to the clipboard on completion\n-h, --help\n               print this help screen\n\nNote: ANY non-option passed in as parameter will be treated as part of the download link; however, options can be inserted throughout and still handled properly.\n"
+	exit 0
+}
+
+copy=true
+link=''
+dir='/dev/null'
+name='/'
+for p in "${@}"; do
+	if [ "$(printf '%s' "$p" | cut -c 1)" = '-' ]; then
+		flag="$(printf '%s' "$p" | cut -c 2)"
+		if [ "$flag" = '-' ]; then
+			flag="$(printf '%s' "$p" | cut -c 3-)"
+			if [ "$flag" = 'help' ]; then
+				h
+			elif [ "$flag" = 'directory-default' ]; then
+				dir=''
+			elif [ "$flag" = 'name-default' ]; then
+				name=''
+			elif [ "$flag" = 'both-default' ]; then
+				dir='' && name=''
+			elif [ "$flag" = 'print' ]; then
+				print=true
+			elif [ "$flag" = 'without-copying' ]; then
+				copy=false
+			else
+				printf '%b' "No such option --$flag.\n"
+				exit 0
+			fi
+		else
+			flagstaff=1
+			while [ "$flagstaff" -lt "${#p}" ]; do
+				flagstaff=$((flagstaff+1))
+				flag="$(printf '%s' "$p" | cut -c "$flagstaff")"
+				if [ "$flag" = 'h' ]; then
+					h
+				elif [ "$flag" = 'd' ]; then
+					dir=''
+				elif [ "$flag" = 'n' ]; then
+					name=''
+				elif [ "$flag" = 'b' ]; then
+					dir='' && name=''
+				elif [ "$flag" = 'p' ]; then
+					print=true
+				elif [ "$flag" = 'w' ]; then
+					copy=false
+				else
+					printf '%b' "No such option -$flag.\n"
+					exit 0
+				fi
+			done
+		fi
+	else
+		link="$link $p"
+	fi
+done
+
+[ -z "$link" ] && x && link="$(xclip -o -selection clipboard)"
+link="$(printf '%s' "$link" | sed 's/ //g' | tr -d "\n")"
+if [ -z "$link" ]; then
+	printf "No download link in clipboard.\n"
+	exit 0
+fi
+
+while : ; do
+	[ -z "$dir" ] && break
+	printf 'Directory (blank for default): '
+	read -r dir
+	dir="$(printf "%s\n" "$dir" | sed "s|~|$HOME|")"
+	[ -d "$dir" ] && break
+done
+if [ -z "$dir" ]; then
+	dir="$HOME"
+else
+	slasht="$(printf '%s' "$dir" | rev | cut -c -1 | rev)"
+	[ "$slasht" = '/' ] && dir="$(printf '%s' "$dir" | rev | cut -c 2- | rev)"
+fi
+
+if [ -n "$name" ]; then
+	printf 'Filename (blank for default): '
+	read -r name
+fi
+[ -z "$name" ] && name="$(printf '%s' "$link" | awk -F'/' '{print $NF}' | awk -F'#' '{print $1}')"
+
+command="/url save $link $dir/$name"
+[ "$copy" = true ] && x && printf '%s' "$command" | $xclipp -selection clipboard
+[ "$print" = true ] && printf "%s\n" "$command"

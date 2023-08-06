@@ -1,0 +1,135 @@
+#!/bin/sh
+
+backlight=$(find /sys/class/backlight | head -n 2 | tail -n 1)
+xtep="$(command -v xte)"
+if [ -z "$xtep" ]; then
+	printf "No xte installation found.\n"
+	x
+fi
+
+h () {
+	printf "keepawake {INTERVAL, KEY, OPTION(S)}\n\nKeeps your computer awake and the screen on by simulating a keypress with xte at intervals. POSIX-compliant!\n\n-b, --brightness\n               fully dim screen during execution and restore to previous brightness on interrupt\n-n, --no-summary\n               provide no output summary on interrupt (incompatible with clear and seconds options)\n-c, --clear\n               clear terminal on interrupt (incompatible with no-summary and seconds options)\n-s, --seconds\n               summarize the runtime in interval-seconds (incompatible with no-summary and clear options)\n-h, --help\n               print this help screen\n\nNote: the brightness option dims the screen before all options are iterated through, so using it multiple times will overwrite the \"previous value\" to 0 and leave the screen dim on interrupt.\n\nIf no key is provided, the default is set to Hyper_L, which should be fairly obsolete. If no interval value (int) is provided, the default is set to 1. Output is not corrected to realtime due to shell limitations, but an interval-second-converted runtime (seconds option) can easily be multiplied or divided as necessary.\n"	
+	x
+}
+
+b () {
+	oldb=$(cat "$backlight"/actual_brightness)
+	printf '0' > "$backlight"/brightness
+}
+
+o () {
+	if [ -z "$summary" ]; then
+		summary='none'
+		[ "$flag" = 'c' ] || [ "$flag" = 'clear' ] && summary='clear'
+		[ "$flag" = 's' ] || [ "$flag" = 'seconds' ] && summary='seconds'
+	else
+		
+		printf "Contradictory flags provided (n/c/s).\n"
+		x
+	fi
+}
+
+x () {
+	rm /tmp/xte.out 2>/dev/null
+	printf '%s' "$oldb" > "$backlight"/brightness
+	exit 0
+}
+
+interval=1
+key='Hyper_L'
+for p in "${@}"; do
+	# handle this with an options array to avoid duplicates (specifically of the brightness option as detailed in the help screen)?
+	if [ "$(printf '%s' "$p" | cut -c 1)" = '-' ]; then
+		flag="$(printf '%s' "$p" | cut -c 2)"
+		if [ "$flag" = '-' ]; then
+			flag="$(printf '%s' "$p" | cut -c 3-)"
+			if [ "$flag" = 'help' ]; then
+				h
+			elif [ "$flag" = 'no-summary' ] || [ "$flag" = 'clear' ] || [ "$flag" = 'seconds' ]; then
+				o
+			elif [ "$flag" = 'brightness' ]; then
+				b
+			else
+				printf '%b' "No such option --$flag.\n"
+				x
+			fi
+		else
+			flagstaff=1
+			while [ "$flagstaff" -lt "${#p}" ]; do
+				flagstaff=$((flagstaff+1))
+				flag="$(printf '%s' "$p" | cut -c "$flagstaff")"
+				if [ "$flag" = 'h' ]; then
+					h
+				elif [ "$flag" = 'n' ] || [ "$flag" = 'c' ] || [ "$flag" = 's' ]; then
+					o
+				elif [ "$flag" = 'b' ]; then
+					b
+				else
+					printf '%b' "No such option -$flag.\n"
+					x
+				fi
+			done
+		fi
+	else
+		case "$(printf '%s' "$p" | sed 's/\.//')" in
+			''|*[!0-9]*)
+				# implement ne flag to disable key errorfile generation?
+				$xtep "key $p" 2>/tmp/xte.out
+				if [ "$(head -n 1 /tmp/xte.out | awk '{print $1}')" != 'Unable' ]; then
+					key="$p"
+				else
+					printf '%b' "No such key $p.\n"
+					x
+				fi
+				;;
+			*)
+				interval="$p"
+				;;
+		esac
+	fi
+done
+
+trap brightness_reset INT
+brightness_reset() {
+	if [ "$summary" = 'none' ]; then
+		for i in $(seq 1 ${#out}); do
+			printf ' '
+		done
+	# fix spacing?
+	elif [ "$summary" = 'seconds' ]; then
+		sout="Kept awake for $i interval-seconds (interval of $interval)"
+		printf ' %s' "$sout"
+		for i in $(seq 1 $((${#out}-${#sout}))); do
+			printf ' '
+		done
+	else
+		printf '%b' " $out"
+	fi
+	printf "\n"
+	[ "$summary" = 'clear' ] && clear
+	x
+}
+
+i=0
+while : ; do
+	$xtep "key $key"
+	wait
+	out='Kept awake for '
+	# once past one interval-hour, the output overflows--fix
+	if [ "$i" -ge 3600 ]; then
+		out="$out$(((i/3600)%3600)) interval-hour"
+		[ $((i/3600)) -gt 1 ] && out="${out}s"
+		out="$out, "
+	fi
+	if [ "$i" -ge 60 ]; then
+		out="$out$(((i/60)%60)) interval-minute"
+		[ $((i/60)) -gt 1 ] && out="${out}s"
+		out="$out, "
+	fi
+	out="$out$((i%60)) interval-second"
+	[ $((i%60)) -ne 1 ] && out="${out}s"
+	i=$((i+1))
+	out="$out (interval of $interval)..."
+	printf '%b' "$out\033[0K\r"
+	sleep "$interval" #2>/dev/null
+done
