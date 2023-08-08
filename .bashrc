@@ -5,24 +5,13 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-# setup
-shopt -s extglob # extra globbing
-shopt -s nullglob # nulls are globbed as empty strings
-shopt -s checkwinsize # updates rows and cols after each command
-
-# env
-export PATH="$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
-export WINEPREFIX="$HOME/.wine"
-
-# personal
-[ -d "$HOME/Downloads" ] && rmdir "$HOME/Downloads"
-HISTCONTROL=ignorespace
-
 # util
 alias ls='ls --color=auto'
 alias lf='ls -Alh'
 alias lc='ls -CF'
 alias grep='grep --color=auto'
+alias nv='nvim'
+alias vim='nvim'
 alias .='pwd'
 alias ..='cd ..'
 alias ~='cd ~'
@@ -30,43 +19,41 @@ alias ~='cd ~'
 alias foldersort='du . -chd 1 | sort -h'
 s () {
 	if [ "$#" -eq 0 ]; then
-		sudo "$(history -p '!!')"
+		cmd="$(history -p '!!')"
+		sudo "$cmd"
 	else
 		sudo "$@"
 	fi
 }
 extract () {
-     if [ -f "$1" ]; then
-         case $1 in
-             *.tar.bz2)   tar xjf "$1"        ;;
-             *.tar.gz)    tar xzf "$1"     ;;
-             *.bz2)       bunzip2 "$1"       ;;
-             *.rar)       rar x "$1"     ;;
-             *.gz)        gunzip "$1"     ;;
-             *.tar)       tar xf "$1"        ;;
-             *.tbz2)      tar xjf "$1"      ;;
-             *.tgz)       tar xzf "$1"       ;;
-             *.zip)       unzip "$1"     ;;
-             *.Z)         uncompress "$1"  ;;
-             *.7z)        7zz x "$1"    ;;
-             *)           echo "'$1' cannot be extracted via extract()" ;;
-         esac
-     else
-         echo "'$1' is not a valid file"
-     fi
+	r () {
+		[ -n "$2" ] && rm "$1"
+	}
+	if [ -f "$1" ]; then
+		case $1 in
+			*.tar.bz2)	tar xjf "$1" && r "$@";;
+			*.tar.gz)	tar xzf "$1" && r "$@";;
+			*.bz2)		bunzip2 "$1" && r "$@";;
+			*.rar)		rar x "$1" && r "$@";;
+			*.gz)		gunzip "$1" && r "$@";;
+			*.tar)		tar xf "$1" && r "$@";;
+			*.tbz2)		tar xjf "$1" && r "$@";;
+			*.tgz)		tar xzf "$1" && r "$@";;
+			*.zip)		unzip "$1" && r "$@";;
+			*.Z)		uncompress "$1" && r "$@";;
+			*.7z)		7zz x "$1" && r "$@";;
+			*)		printf "'%s' cannot be extracted via extract()" "$1"
+		esac
+	else
+		printf "'%s' is not a valid file\n" "$1"
+	fi
 }
 gt () {
-	path="$(printf '%s' "$_" | sed "s|~|$HOME|")"
+	path="$_"
 	if ! [ "${path:0:1}" = '/' ]; then
-		# could do something more sophisticated and check if the latest cd was for the original path (opath, which is just $_)
-		if [ "$(history | tail -n2 | head -n1 | awk '{print $2}')" = 'cd' ]; then
-			path="$OLDPWD/$path"
-		else
-			path="$PWD/$path"
-		fi
+		path="$(realpath "$path" 2>/dev/null)"
 	fi
 	[ -f "$path" ] && path="$(printf '%s' "$path" | sed 's/^\(.*\)\/[^\/]*$/\1/')"
-	path="$(find / 2>/dev/null | grep "$path" | head -n1)"
 	if [ -d "$path" ]; then
 		printf "Navigating to %s\n" "$path"
 		cd "$path" || exit
@@ -105,6 +92,7 @@ printf "%s\n" "$(date -d @"$sum" -u +%H:%M:%S)"
 miyu () {
 	printf '%b' "$(cat ~/docs/logs/miyu_out.txt ~/.local/share/profanity/chatlogs/anti_at_witch.crft.sh/miyu_at_witch.crft.sh/* | sed 's/^.*[miyu\@witch\.crft\.sh|miyu|me]: \(.*\)$/\1/')\n"
 }
+# this could be universalized like fm, but atm that doesn't seem worth it (the cost of typing out the full path vs. the lack of other sizeable groups of numbered files on my system)
 vnc () {
 	which='anti'
 	[ -n "$1" ] && which="$1"

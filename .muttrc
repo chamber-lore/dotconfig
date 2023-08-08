@@ -1,0 +1,55 @@
+# general
+set imap_check_subscribed
+set imap_keepalive=300
+unset imap_passive
+set mail_check=60
+set mail_check_stats
+set mailcap_path='~/.mutt/mailcap'
+
+# headers
+ignore *
+unignore from: date subject to cc
+unignore x-mailer:
+unignore x-mailing-list: posted-to:
+hdr_order From To Cc Date
+
+# messages
+alternative_order text/plain text/html
+auto_view text/html
+set auto_tag=yes
+set editor="nvim -c 'set textwidth=0 wrapmargin=0'"
+set mark_old=no
+set menu_scroll=yes
+set message_cachedir='~/.cache/mutt/messages'
+set move=no
+set query_command="khard email --parsable %s"
+set text_flowed=yes
+set timeout=300
+source "~/.mutt/purgecache.sh '$message_cachedir'|"
+
+# sorting
+set sort=threads
+set sort_aux=reverse-last-date-received
+set sort_browser=date
+
+# vim keys
+bind pager j next-line
+bind pager k previous-line
+bind attach,index,pager \CD next-page
+bind attach,index,pager \CU previous-page
+bind pager g top
+bind pager G bottom
+bind attach,index g first-entry
+bind attach,index G last-entry
+
+# paranoid
+source "~/.mutt/paranoid"
+folder-hook $folder 'source ~/.mutt/paranoid'
+
+# danwin
+source "~/.mutt/danwin"
+folder-hook $folder 'source ~/.mutt/danwin'
+
+# disroot
+source "~/.mutt/disroot"
+folder-hook $folder 'source ~/.mutt/disroot'

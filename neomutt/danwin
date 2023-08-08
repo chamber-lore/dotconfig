@@ -1,0 +1,18 @@
+## IMAP
+set imap_user=anti@danwin1210.de
+set folder=imaps://"$imap_user"/
+set spoolfile=+INBOX
+set postponed=+Drafts
+set mbox=+Archive
+
+## SMTP
+set realname='anti'
+set from=$imap_user
+set smtp_url=smtp://danwin1210.de:587
+set ssl_starttls
+
+# folders
+mailboxes =Inbox
+account-hook $folder "set imap_user=anti@danwin1210.de"
+
+color status blue default

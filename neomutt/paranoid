@@ -1,0 +1,18 @@
+# IMAP
+set imap_user=anti@paranoid.email
+set folder=imaps://"$imap_user":993/
+set spoolfile=+INBOX
+set postponed=+Drafts
+set mbox=+Archive
+
+# SMTP
+set realname='anti'
+set from=$imap_user
+set smtp_url=smtp://"$imap_user":25
+set ssl_starttls
+
+# folders
+mailboxes =Inbox
+account-hook $folder "set imap_user=anti@paranoid.email"
+
+color status green default
