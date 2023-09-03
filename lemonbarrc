@@ -1,9 +1,11 @@
 #!/bin/sh
 
 brightness () {
-	level=$(cat /sys/class/backlight/amdgpu_bl0/brightness)
-	#total=$(cat /sys/class/backlight/amdgpu_bl0/max_brightness)
-	total=255
+  # using head -n1 is always a bit fraught, but idk if my case of the number (amdgpu_bl_1_) being higher than before (amdgpu_bl_0_) is universal, so I'm not going to make any assumptions besides "old dirs will be removed" (whether there could still be multiple dirs if so is beyond me as well)
+  backlight="$(find /sys/class/backlight | grep -v '/sys/class/backlight$' | head -n1)"
+	level=$(cat "$backlight"/brightness)
+	#total=$(cat "$backlight"/max_brightness)
+  total=255
 	printf 'Screen brightness: %s' "$level/$total"
 }
 

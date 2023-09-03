@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# somehow this is faster than sed!
+query=''
+for p; do
+  if [ -n "$query" ]; then
+    query="$query+$p"
+  else
+    query="$p"
+  fi
+done
+
+# filters?
+invidious="$(curl --silent "https://invidious.snopyta.org/search?q=$query")"
+titlinks="$(printf '%s' "$invidious" | grep -E "<a href=\"/watch\?v=.{11}\"")"
+titles="$(printf '%s' "$titlinks" | sed "s/^.*<a href=\".*\"><p dir=\"auto\">\(.*\)<\/p><\/a>$/\1/")"
+#youtube="$(curl --silent "https://www.youtube.com/results?search_query=$query&sp=EgIQAQ%253D%253D" | sed 's/{/{\n/g' | sed 's/}/}\n/g')"
+#titles="$(printf '%s' "$youtube" | grep -iA2 ",\"title\":{" | grep "\"text\":" | sed 's/^.text.:.\(.*\).}/\1/')"
+num_results="$(printf '%s' "$titles" | wc -l)"
+if [ "$num_results" = '0' ]; then
+  printf 'No results found for query, sorry!\n'
+  exit 1
+fi
+channels="$(printf '%s' "$invidious" | grep '<p class="channel-name" dir="auto">' | sed "s/^.*<p class=\"channel-name\" dir=\"auto\">\(.*\)$/\1/")"
+#channels="$(printf '%s' "$youtube" | grep -iA2 "WEB_PAGE_TYPE_CHANNEL" | grep -E "\"url\":\"/" | sed 's/^.*\/\(.*\).,.webPageType.*$/\1/' | sed -n '1~4p')"
+#case "$(printf '%s' "$channels" | head -n1)" in
+#  @);;
+#  *) [ "$(printf '%s' "$channels" | wc -l)" -gt $((num_results)) ] && channels="$(printf '%s' "$channels" | sed '1d')";;
+#esac
+views="$(printf '%s' "$invidious" | grep -E '^.*<p class="video-data" dir="auto">.*view[s]?</p>$' | sed "s/^.*<p class=\"video-data\" dir=\"auto\">\(.*\) view[s]\?<\/p>$/\1/")"
+#views="$(printf '%s' "$youtube" | grep -i "^\"simpleText\"" | grep views | sed 's/^.*:.\(.* view[s]\{0,1\}\).*$/\1/')"
+links="$(printf '%s' "$titlinks" | sed "s/^.*<a href=\"\(.*\)\"><p dir=\"auto\">.*<\/p><\/a>$/https:\/\/www.youtube.com\1/")"
+#links="$(printf '%s' "$youtube" | grep 'watch?v=' | sed 's/^.url.:.\/watch?v=\(.\{11\}\).*$/\1/' | uniq)"
+lengths="$(printf '%s' "$invidious" | grep '<p class="length">' | sed "s/^.*<p class=\"length\">\(.*\)<\/p>$/\1/")"
+dates="$(printf '%s' "$invidious" | grep -E '^.*<p class="video-data" dir="auto">Shared .*</p>$' | sed "s/^.*<p class=\"video-data\" dir=\"auto\">Shared \(.*\)<\/p>$/\1/")"
+
+get_line () {
+  printf '%s' "$2" | sed -n "${1}p" | tr -d '\n'
+}
+
+for i in $(seq 1 $((num_results))); do
+  title="$(get_line "$i" "$titles")"
+  channel="$(get_line "$i" "$channels")"
+  view="$(get_line "$i" "$views")"
+  link="$(get_line "$i" "$links")"
+  length="$(get_line "$i" "$lengths")"
+  date="$(get_line "$i" "$dates")"
+
+  #link="$(get_line "$i" "$links")" && link="https://www.youtube.com/watch?v=$link"
+  printf '%s. Title: %s, channel: %s, view count: %s, length: %s, date published: %s, URL: %s\n' "$i" "$title" "$channel" "$view" "$length" "$date" "$link"
+  #printf '%s. Title: %s, channel: %s, view count: %s, URL: %s\n' "$i" "$title" "$channel" "$view" "$link"
+done
+
+while : ; do
+  printf 'Which video to play? (1-%s) ' "$num_results" && read -r num_user
+  if [ $((num_user)) -lt 1 ] || [ $((num_user)) -gt $((num_results)) ]; then
+    printf 'Please enter a number within the range!\n'
+  else
+    #pick="$(get_line "$num_user" "$links")" && pick="https://www.youtube.com/watch?v=$pick"
+    pick="$(get_line "$num_user" "$links")"
+    nohup mpv "$pick" &
+    printf 'Press return to exit the program.\n'
+    read -r && exit 0
+  fi
+done

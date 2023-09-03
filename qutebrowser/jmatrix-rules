@@ -153,3 +153,6 @@ www.imdb.com m.media-amazon.com xhr allow
 www.imdb.com m.media-amazon.com script allow
 www.imdb.com images-na.ssl-images-amazon.com script allow
 www.imdb.com cloudfront.net script allow
+www.metaculus.com d3s0w6fek99l5b.cloudfront.net script allow
+programs.clearerthinking.org www.guidedtrack.com script allow
+programs.clearerthinking.org www.guidedtrack.com xhr allow

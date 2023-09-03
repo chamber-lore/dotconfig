@@ -2,7 +2,12 @@
 
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-bspc monitor -d I II III IV V VI VII VIII IX X
+if xrandr -q | grep -q 'DisplayPort-1 connected'; then
+  bspc monitor eDP -d I II III IV V
+  bspc monitor DisplayPort-1 -d VI VII VIII IX X
+else
+  bspc monitor -d I II III IV V VI VII VIII IX X
+fi
 
 bspc config border_width         2
 bspc config window_gap           0
@@ -18,7 +23,10 @@ bspc rule -a mplayer2 state=floating
 #bspc rule -a Screenkey manage=off
 
 picom -b --config ~/.config/picom/picom.conf &
-~/.config/lemonbar/lemonbarrc | lemonbar -p -g $(xwininfo -root | grep 'Width' | cut -c 10-)x40 &
+~/.config/lemonbar/lemonbarrc | lemonbar -p -g $(($(xwininfo -root | grep 'Width' | cut -c10-)))x40 &
 alacritty -e bash -c 'profanity' &
-sleep 0.1
-alacritty -e bash -c 'vim ~/docs/omni.txt && newsboat -r && clear && neofetch && cal -mn3 && $SHELL' &
+# this could be more thorough (as in the bashrc) but it's not really necessary unless you somehow have a zombie process that's survived X literally being killed, which seems impossible to me--but I may as well put this here anyway
+until pgrep 'profanity'; do
+  :
+done
+alacritty -e bash -c "vim ~/docs/omni.txt && newsboat -r && clear && neofetch && cal -mn3 && $SHELL" &

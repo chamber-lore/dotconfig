@@ -20,11 +20,11 @@ XF86AudioMicMute
 
 # increase screen brightness
 XF86MonBrightnessUp
-	echo $(($(cat /sys/class/backlight/amdgpu_bl0/actual_brightness)+5)) > /sys/class/backlight/amdgpu_bl0/brightness
+  backlight="$(find /sys/class/backlight | grep -v '/sys/class/backlight$' | head -n1)" && echo $(($(cat "$backlight"/actual_brightness)+5)) > "$backlight"/brightness
 
 # decrease screen brightness
 XF86MonBrightnessDown
-	echo $(($(cat /sys/class/backlight/amdgpu_bl0/actual_brightness)-5)) > /sys/class/backlight/amdgpu_bl0/brightness
+	backlight="$(find /sys/class/backlight | grep -v '/sys/class/backlight$' | head -n1)" && echo $(($(cat "$backlight"/actual_brightness)-5)) > "$backlight"/brightness
 
 # take screenshot
 Print

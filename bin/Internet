@@ -61,6 +61,9 @@ iwd_restart() {
 }
 
 connectivity_check() {
+  # use timeout:
+  # timeout "$time"s ping -c1 archlinux.org 2>/dev/null 1>&2
+  # this won't return 0
 	ping -c1 archlinux.org 2>/dev/null 1>&2
 	return $?
 }
