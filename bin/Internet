@@ -1,6 +1,8 @@
 #!/bin/sh
 
-interface="$(ip link show | grep 'BROADCAST' | head -n1 | awk -F': ' '{print $2}')"
+# there needs to be a more robust way of doing this
+#interface="$(ip link show | grep 'BROADCAST' | head -n1 | awk -F': ' '{print $2}')"
+interface=$(ip link show | grep 'BROADCAST' | tail -n1 | awk -F': ' '{print $2}')
 if [ -n "$1" ]; then
 	ssid="$1"
 else

@@ -90,9 +90,10 @@ fi
 if [ -n "$name" ]; then
 	printf 'Filename (blank for default): '
 	read -r name
+  command="/url save $link $dir/$name"
+else
+  command="/url save $link $dir"
 fi
-[ -z "$name" ] && name="$(printf '%s' "$link" | awk -F'/' '{print $NF}' | awk -F'#' '{print $1}')"
 
-command="/url save $link $dir/$name"
 [ "$copy" = true ] && x && printf '%s' "$command" | $xclipp -selection clipboard
 [ "$print" = true ] && printf "%s\n" "$command"

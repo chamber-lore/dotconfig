@@ -1,0 +1,70 @@
+#!/bin/sh
+
+brightness () {
+  # using head -n1 is always a bit fraught, but idk if my case of the number (amdgpu_bl_1_) being higher than before (amdgpu_bl_0_) is universal, so I'm not going to make any assumptions besides "old dirs will be removed" (whether there could still be multiple dirs if so is beyond me as well)
+  backlight="$(find /sys/class/backlight | grep -v '/sys/class/backlight$' | head -n1)"
+	level=$(cat "$backlight"/brightness)
+	#total=$(cat "$backlight"/max_brightness)
+  total=255
+	printf 'Screen brightness: %s' "$level/$total"
+}
+
+#storage () {
+#	space=($(df --block-size=1 / | tail -n 1))
+#	total=$(($((${space[2]}))+$((${space[3]}))))
+#	printf "$(numfmt ${space[2]} --to=iec)/$(numfmt $total --to=iec) (${space[4]}) of disk space used"
+#}
+
+audio () {
+	speakers="$(pactl get-sink-volume @DEFAULT_SINK@ | awk '{print $5}')"
+	if [ "$(pactl get-sink-mute @DEFAULT_SINK@)" = 'Mute: yes' ]; then
+		speakers="$speakers, muted"
+	else
+		speakers="$speakers, not muted"
+	fi
+	if [ "$(pactl get-source-mute @DEFAULT_SOURCE@)" = 'Mute: yes' ]; then
+		microphone='muted'
+	else
+		microphone='not muted'
+	fi	
+	if ! printf '%s' "$speakers" | grep -q '%'; then
+		pulseaudio --start
+	else
+		printf '%s' "Speakers: $speakers. Microphone: $microphone"
+	fi
+}
+
+battery () {
+	charge=$(acpi | grep -v 'Unknown' | head -n1 | sed 's/,//g')
+	if [ "$(printf '%s' "$charge" | awk '{print $3}')" = 'Not' ] || [ "$(printf '%s' "$charge" | awk '{print $3}')" = 'Full' ]; then
+		printf "Battery: fully charged"
+	else
+		printf '%s' "Battery: $(printf '%s' "$charge" | awk '{print tolower($3)}') from $(printf '%s' "$charge" | awk '{print $4}') with $(printf '%s' "$charge" | awk '{print $5}') remaining"
+	fi
+}
+
+clock () {
+	printf '%s' "$(date "+%A, %Y-%m-%d, %T")"
+}
+
+if type -p pactl; then
+	pulseaudio --start
+	pactl get-sink-volume @DEFAULT_SINK@ && do_audio='yup'
+fi
+[ -d '/sys/class/backlight' ] && [ -n "$(cat "$(find /sys/class/backlight 2>/dev/null | grep -v '/sys/class/backlight$' | head -n1)"/brightness 2>/dev/null)" ] && do_brightness='yup'
+type -p acpi 1>/dev/null && acpi 2>/dev/null | grep -q 'Battery' && do_battery='yup'
+type -p date && do_clock='yup'
+
+while : ; do
+	desktop=$(bspc query -D -d focused --names)
+	out="%{c}$desktop  "
+	# more elegant way to do this?
+	[ -n "$do_audio" ] && out="$out$(audio). "
+	[ -n "$do_brightness" ] && out="$out$(brightness). "
+	[ -n "$do_battery" ] && out="$out$(battery). "
+	[ -n "$do_clock" ] && out="$out$(clock). "
+	# maybe just redirect stderr to /dev/null? would that have the same effect?
+	out="$out $desktop"
+	echo "$out"
+	sleep 0.2
+done

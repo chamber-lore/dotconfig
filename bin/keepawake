@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# functions have to be defined before they're called; HOWEVER: https://unix.stackexchange.com/questions/331837/how-to-read-the-whole-shell-script-before-executing-it
+x () {
+	rm /tmp/xte.out 2>/dev/null
+	printf '%s' "$oldb" > "$backlight"/brightness
+	exit 0
+}
+
+# better error detection for this--abort the flag if it's not possible to change the brightness, or even just find the filepath
 backlight=$(find /sys/class/backlight | head -n 2 | tail -n 1)
 xtep="$(command -v xte)"
 if [ -z "$xtep" ]; then
@@ -27,12 +35,6 @@ o () {
 		printf "Contradictory flags provided (n/c/s).\n"
 		x
 	fi
-}
-
-x () {
-	rm /tmp/xte.out 2>/dev/null
-	printf '%s' "$oldb" > "$backlight"/brightness
-	exit 0
 }
 
 interval=1

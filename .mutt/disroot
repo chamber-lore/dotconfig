@@ -1,0 +1,19 @@
+# IMAP
+set imap_user=antimetabolism@disroot.org
+set folder=imaps://"$imap_user"/
+set spoolfile=+INBOX
+set postponed=+Drafts
+set record=+Sent
+set mbox=+Archive
+
+# SMTP
+set realname='anti'
+set from=$imap_user
+set smtp_url=smtp://"$imap_user":587/
+set ssl_starttls
+
+# folders
+mailboxes =Inbox
+account-hook $folder "set imap_user=antimetabolism@disroot.org"
+
+color status red default

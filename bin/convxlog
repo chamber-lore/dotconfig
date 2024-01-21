@@ -12,9 +12,10 @@ until [ -s "$path" ]; do
 		printf 'Enter file path: '
 		read -r file
 	fi
+	# look into dirname command
 	dir=$(printf '%s' "$file" | awk -F'/' '{$NF=""; print $0}' | sed "s/ /\//g")
 	name=$(printf '%s' "$(printf '%s' "$file" | awk -F'/' '{print $NF}')" | awk -F'.' '{print $1}')
-	xt=$(printf '%s' "$(printf '%s' "$file" | awk -F'/' '{print $NF}')" | awk -F'.' '{$1="."; print $0}' | sed 's/ //')
+	xt=$(printf '%s' "$(printf '%s' "$file" | awk -F'/' '{print $NF}')" | awk -F'.' '{print "."$NF}' | sed 's/ //')
 	path=$(printf '%s' "${dir} ${name} ${xt}" | sed 's/ //g')
 	outpath=$(printf '%s' "${dir} ${name}_out ${xt}" | sed 's/ //g')
 	if ! [ -s "$path" ] ; then
@@ -42,9 +43,10 @@ printf "" > "$outpath"
 total=$(wc -l < "$path")
 count=0
 while IFS='' read -r line || [ -n "$line" ]; do
-	if date -d @"$(printf '%s' "$line" | awk '{print $1}')" 2>/dev/null 1>&2 ; then
+	transdation=$(date -d @"$(printf '%s' "$line" | awk '{print $1}')" 2>/dev/null)
+	if [ -n "$transdation" ] ; then
 		# gajim style
-		out=$(date -d @"$(printf '%s' "$line" | awk '{print $1}')" 2>/dev/null)
+		out="$transdation"
 		if [ "$(printf '%s' "$line" | awk '{print $2}')" = '4' ]; then
 			out="$out $theirname:"
 		else
@@ -59,7 +61,7 @@ while IFS='' read -r line || [ -n "$line" ]; do
 		else
 			out="$out $theirname:"
 		fi
-		message=$(printf '%s' "$line" | awk '{ for (i=4; i<=NF; i++) printf("%s ",$i) }END{ print"" }')
+		message=$(printf '%s' "$line" | awk '{ if (NF != 1) for (i=1; i<4; i++) $i="" }END{ print $0 }')
 	fi
 	out="$out $message"
 	printf '%s\n' "$out" >> "$outpath"

@@ -1,0 +1,87 @@
+[connection]
+reconnect=5
+
+autoping.timeout=15
+
+carbons=true
+
+defaccount=anti
+
+autoping=15
+
+[logging]
+chlog=true
+
+[omemo]
+log=on
+
+policy=automatic
+
+[ui]
+history=true
+roster=true
+roster.count=items
+roster.resource=false
+roster.empty=false
+roster.unread=after
+roster.wrap=true
+occupants.wrap=true
+occupants.size=12
+
+titlebar.position=1
+mainwin.position=2
+statusbar.position=3
+inputwin.position=4
+
+roster.private=off
+
+beep=false
+
+roster.status=false
+roster.presence=false
+
+[alias]
+happy=(≡^∇^≡)
+fighter=(๑˃ᴗ˂)ﻭ
+smile=˶ᵔᵕᵔ˶
+joy=o((*^▽^*))o
+laugh=(´∀`*)
+lenny=(¬‿¬ )
+kiss=(ﾉ´ з `)ノ
+afraid=┌(。Д。)┐
+thumbsup=(b ᵔ▽ᵔ)b
+distraught=(╯✧▽✧)╯
+maniac=╰(▔∀▔)╯
+shock=L(° O °L)
+rip=(×_×)
+brow=(o_O)
+sleepy=(ᴗ˳ᴗ)
+kiss2=(ʃƪ ˘ ³˘)♥(˘ ε˘ʃƪ)
+kiss3=( ^ᴗ^)ε^ )
+kiss4=(ɔˆз(ˆ⌣ˆc)
+bat=^•^*
+together=( ˘ω˘)(˘ω˘ )
+cat=( =ω= )
+bear=(^◔ᴥ◔^)
+angel=ʚ(^ᴗ^)ɞ
+singing=( ◜◒◝)♪♩♬
+demon=↜(>ᴗ•)ψ
+tear=(υ ♥,ᵕ♥,)
+boxy=[•w•̀]
+awe=p(◕-◕)q
+kiss5=ʚ( ^з^)♥(>ᵕ◕ )ψ
+wink=(-‿◕)
+kiss6=ʚ( ♥з♥)ʚ
+angelfish=ʚ( ♥з♥)
+shrug=¯\\_(°-°)_/¯
+kiss7=ψ( ◕з<)♥(^ᴗ^ )ɞ
+
+ded=(×_×)
+angel2=ପ(๑•ᴗ•๑)ଓ
+batkiss=^з^♥^ᵕ◕
+
+[digdeeper@muc.digdeeper.club]
+notify.mention=false
+
+[notifications]
+message=true

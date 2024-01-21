@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# add support for different modes, perhaps with different filepaths? e.g., macronutrient breakdowns, food items, pattern recognition, external information (wolframengine? doesn't work on arch; google search curk/web scrape?)
 path="/home/proanti/docs/food_log.txt"
 
 add () {	

@@ -14,10 +14,10 @@ unignore x-mailing-list: posted-to:
 hdr_order From To Cc Date
 
 # messages
-alternative_order text/plain text/html
+alternative_order text/html text/plain
 auto_view text/html
 set auto_tag=yes
-set editor="nvim -c 'set textwidth=0 wrapmargin=0'"
+set editor="vim -c 'set textwidth=0 wrapmargin=0'"
 set mark_old=no
 set menu_scroll=yes
 set message_cachedir='~/.cache/mutt/messages'
@@ -42,9 +42,28 @@ bind pager G bottom
 bind attach,index g first-entry
 bind attach,index G last-entry
 
-# paranoid
-source "~/.mutt/paranoid"
-folder-hook $folder 'source ~/.mutt/paranoid'
+# pgp encryption
+set pgp_decode_command="gpg %?p?--passphrase-fd 0? --no-verbose --batch --output - %f"
+set pgp_verify_command="gpg --no-verbose --batch --output - --verify %s %f"
+set pgp_decrypt_command="gpg --passphrase-fd 0 --no-verbose --batch --output - %f"
+set pgp_sign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --detach-sign --textmode %?a?-u %a? %f"
+set pgp_clearsign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --textmode --clearsign %?a?-u %a? %f"
+set pgp_encrypt_only_command="pgpewrap gpg --batch --quiet --no-verbose --output - --encrypt --textmode --armor --always-trust --encrypt-to anti(metabolism) -- -r %r -- %f"
+set pgp_encrypt_sign_command="pgpewrap gpg --passphrase-fd 0 --batch --quiet --no-verbose --textmode --output - --encrypt --sign %?a?-u %a? --armor --always-trust --encrypt-to anti(metabolism) -- -r %r -- %f"
+set pgp_import_command="gpg --no-verbose --import -v %f"
+set pgp_export_command="gpg --no-verbose --export --armor %r"
+set pgp_verify_key_command="gpg --no-verbose --batch --fingerprint --check-sigs %r"
+set pgp_list_pubring_command="gpg --no-verbose --batch --with-colons --list-keys %r"
+set pgp_list_secring_command="gpg --no-verbose --batch --with-colons --list-secret-keys %r"
+set pgp_autoencrypt=yes
+set pgp_autosign=yes
+set pgp_replyencrypt=yes
+set pgp_replysign=yes
+set pgp_sign_as='anti(metabolism)'
+set pgp_good_sign="^gpg: Good signature from"
+set pgp_verify_sig=yes
+set pgp_strict_enc
+set pgp_timeout=1800
 
 # danwin
 source "~/.mutt/danwin"

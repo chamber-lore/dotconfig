@@ -23,7 +23,8 @@ export HISTFILE="$HOME"/.bash_history
 
 # env
 export PATH="$HOME"/bin:"$HOME"/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
-export EDITOR=/usr/bin/nvim
+export EDITOR=/usr/bin/vim
+export BROWSER=/usr/bin/qutebrowser
 export WINEPREFIX="$HOME"/.wine
 
 # homedir cleanup (one-line commentable)
@@ -39,15 +40,12 @@ histdel () {
 }
 histdel
 dotconfig () {
-  files=("$HOME/.bash_profile" "$HOME/.bashrc" "$HOME/bin/convxlog" "$HOME/bin/dlxfile" "$HOME/bin/food" "$HOME/bin/Internet" "$HOME/bin/keepawake" "$HOME/bin/playvid" "$HOME/bin/wakeup" "$HOME/.config/bspwm/bspwmrc" "$HOME/.config/lemonbar/lemonbarrc" "$HOME/.muttrc" "$HOME/.mutt/danwin" "$HOME/.mutt/disroot" "$HOME/.mutt/paranoid" "$HOME/.mutt/purgecache.sh" "$HOME/.config/picom/picom.conf" "$HOME/.config/profanity/profrc" "$HOME/.config/qutebrowser/config.py" "$HOME/.config/qutebrowser/jmatrix-rules" "$HOME/.config/sxhkd/sxhkdrc" "$HOME/.mozilla/firefox/m9njnno4.arkenfox/user.js" "$HOME/.vimrc")
+  files=(".bash_profile" ".bashrc" "bin/convxlog" "bin/dlxfile" "bin/food" "bin/Internet" "bin/keepawake" "bin/playvid" "bin/wakeup" ".config/bspwm/bspwmrc" ".config/lemonbar/lemonbarrc" "docs/logs/get_log.sh" "docs/logs/get_all.sh" "vids/music_download.sh" "vids/music_download_mkv.sh" ".muttrc" ".mutt/danwin" ".mutt/disroot" ".mutt/purgecache.sh" ".config/picom/picom.conf" ".config/profanity/profrc" ".config/qutebrowser/config.py" ".config/qutebrowser/jmatrix-rules" ".config/sxhkd/sxhkdrc" ".mozilla/firefox/8w40cz1t.hardened/user.js" ".vimrc")
   for file in "${files[@]}"; do
-    case "$file" in
-      *"$HOME/bin/"*) cp -v "$file" ~/git/dotconfig/bin;;
-      *"$HOME/.mutt/"*) cp -v "$file" ~/git/dotconfig/neomutt;;
-      *"$HOME/.config/qutebrowser/"*) cp -v "$file" ~/git/dotconfig/qutebrowser;;
-      *) cp -v "$file" ~/git/dotconfig
-    esac
+    dir=$(dirname "$file")
+    [ "$dir" != '.' ] && mkdir -p ~/git/dotconfig/"$(dirname $file)"
+    cp -v "$HOME/$file" ~/git/dotconfig/"$file"
   done
 }
 dotconfig
-rm nohup.out 2>/dev/null
+find / -name 'nohup.out' 2>/dev/null | xargs rm 2>/dev/null
